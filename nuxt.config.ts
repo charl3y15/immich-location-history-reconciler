@@ -7,7 +7,11 @@ export default defineNuxtConfig({
   },
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "@primevue/nuxt-module"],
+  modules: [
+    "@nuxt/eslint",
+    "@primevue/nuxt-module",
+    "@vueuse/nuxt",
+  ],
   primevue: {
     options: {
       theme: {
