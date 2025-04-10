@@ -11,11 +11,16 @@ export default defineNuxtConfig({
     "@nuxt/eslint",
     "@primevue/nuxt-module",
     "@vueuse/nuxt",
+    "@nuxtjs/tailwindcss",
   ],
   primevue: {
     options: {
       theme: {
         preset: Aura,
+        cssLayer: {
+          name: 'primevue',
+          order: 'theme, base, primevue'
+        }
       },
     },
   },
