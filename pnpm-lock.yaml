@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@immich/sdk':
+        specifier: ^1.131.3
+        version: 1.131.3
       '@nuxt/eslint':
         specifier: 1.3.0
         version: 1.3.0(@vue/compiler-sfc@3.5.13)(eslint@9.24.0(jiti@2.4.2))(magicast@0.3.5)(typescript@5.8.3)(vite@6.2.6(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))
@@ -441,6 +444,9 @@ packages:
     resolution: {integrity: sha512-xeO57FpIu4p1Ri3Jq/EXq4ClRm86dVF2z/+kvFnyqVYRavTZmaFaUBbWCOuuTh0o/g7DSsk6kc2vrS4Vl5oPOQ==}
     engines: {node: '>=18.18'}
 
+  '@immich/sdk@1.131.3':
+    resolution: {integrity: sha512-zmSGON8cpUmhvHg7dLXxMpZhJyIDE+Nk9k9G4U8iy2wVtxT4sd3eI8n60M2T8J+87UT49p2nRVsJoj89djA5Gg==}
+
   '@ioredis/commands@1.2.0':
     resolution: {integrity: sha512-Sx1pU8EM64o2BrqNpEO1CNLtKQwyhuXuqyfH7oGKCk+1a33d2r5saW8zNwm3j6BTExtjrv2BxTgzzkMwts6vGg==}
 
@@ -596,6 +602,9 @@ packages:
 
   '@nuxtjs/tailwindcss@6.13.2':
     resolution: {integrity: sha512-knCmVe1I0div4tWj6f9GRaHX97zqD257gOeG4JIcWsC0yRfoiT34GBAyqK8Sc15qiKKMB/lZK6Z3skQRYRk/1Q==}
+
+  '@oazapfts/runtime@1.0.4':
+    resolution: {integrity: sha512-7t6C2shug/6tZhQgkCa532oTYBLEnbASV/i1SG1rH2GB4h3aQQujYciYSPT92hvN4IwTe8S2hPkN/6iiOyTlCg==}
 
   '@oxc-parser/binding-darwin-arm64@0.56.5':
     resolution: {integrity: sha512-rj4WZqQVJQgLnGnDu2ciIOC5SqcBPc4x11RN0NwuedSGzny5mtBdNVLwt0+8iB15lIjrOKg5pjYJ8GQVPca5HA==}
@@ -4478,6 +4487,10 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.2': {}
 
+  '@immich/sdk@1.131.3':
+    dependencies:
+      '@oazapfts/runtime': 1.0.4
+
   '@ioredis/commands@1.2.0': {}
 
   '@isaacs/cliui@8.0.2':
@@ -4871,6 +4884,8 @@ snapshots:
       - magicast
       - supports-color
       - ts-node
+
+  '@oazapfts/runtime@1.0.4': {}
 
   '@oxc-parser/binding-darwin-arm64@0.56.5':
     optional: true
