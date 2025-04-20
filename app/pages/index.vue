@@ -28,9 +28,9 @@ async function uploadTimeline(event: FileUploadSelectEvent) {
 
 // Filters
 
-const cameraModel = ref("");
-const tagIds = ref<string[] | null>(null);
-const isNotInAlbum = ref(false);
+const cameraModel = useLocalStorage("camera-model", "");
+const tagIds = useLocalStorage<string[] | null>("tag-ids", null);
+const isNotInAlbum = useLocalStorage("is-not-in-album", false);
 </script>
 
 <template>
