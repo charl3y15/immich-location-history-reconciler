@@ -7,9 +7,10 @@ import {
   type TagResponseDto,
 } from "@immich/sdk";
 
-const tagIds = defineModel<string[] | null>("tagIds", { default: null });
+const tagIds = defineModel<string[]>("tagIds", { default: [] });
 const cameraModel = defineModel<string>("cameraModel", { default: "" });
 const isNotInAlbum = defineModel<boolean>("isNotInAlbum", { default: false });
+const pageSize = defineModel<number>("pageSize", { default: 10 });
 
 const {
   data: tags,
@@ -24,6 +25,11 @@ const {
   () => getSearchSuggestions({ $type: SearchSuggestionType.CameraModel }),
   { transform: (models) => models.map((model) => model || "Unknown") }
 );
+
+const pageOptions = [5, 10, 20, 50].map((count) => ({
+  label: count.toString(),
+  value: count,
+}));
 </script>
 
 <template>
@@ -68,6 +74,16 @@ const {
     <div class="flex items-center gap-2">
       <Checkbox v-model="isNotInAlbum" inputId="not-in-album" binary />
       <label for="not-in-album">Not in any albums</label>
+    </div>
+    <div>
+      <Select
+        v-model="pageSize"
+        :options="pageOptions"
+        placeholder="Items per page"
+        option-label="label"
+        option-value="value"
+        filter
+      />
     </div>
   </div>
 </template>

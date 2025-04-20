@@ -7,10 +7,11 @@ import {
   type SearchResponseDto,
 } from "@immich/sdk";
 
-const { tagIds, isNotInAlbum, cameraModel } = defineProps<{
-  tagIds: string[] | null;
+const { tagIds, isNotInAlbum, cameraModel, pageSize = 10 } = defineProps<{
+  tagIds: string[];
   isNotInAlbum: boolean;
   cameraModel: string;
+  pageSize?: number;
 }>();
 
 // TODO pagination
@@ -28,16 +29,16 @@ const { data: result, error } = useAsyncData<
         isVisible: true,
 
         // Search filters
-        tagIds: tagIds ?? [],
+        tagIds,
         isNotInAlbum,
         model: cameraModel,
 
         // Pagination
-        size: 10,
+        size: pageSize,
       },
     }),
   {
-    watch: [() => tagIds, () => isNotInAlbum, () => cameraModel],
+    watch: [() => tagIds, () => isNotInAlbum, () => cameraModel, () => pageSize],
     transform: ({ assets }) => assets,
   }
 );

@@ -29,8 +29,9 @@ async function uploadTimeline(event: FileUploadSelectEvent) {
 // Filters
 
 const cameraModel = useLocalStorage("camera-model", "");
-const tagIds = useLocalStorage<string[] | null>("tag-ids", null);
+const tagIds = useLocalStorage<string[]>("tag-ids", []);
 const isNotInAlbum = useLocalStorage("is-not-in-album", false);
+const pageSize = useLocalStorage("page-size", 10);
 </script>
 
 <template>
@@ -63,18 +64,19 @@ const isNotInAlbum = useLocalStorage("is-not-in-album", false);
       <Panel
         v-if="baseUrl && apiKey"
         :key="baseUrl + apiKey"
-        header="Image filters"
+        header="Image search options"
         toggleable
       >
         <Filters
           v-model:cameraModel="cameraModel"
           v-model:tagIds="tagIds"
           v-model:isNotInAlbum="isNotInAlbum"
+          v-model:page-size="pageSize"
         />
       </Panel>
     </header>
   </div>
   <main v-if="baseUrl && apiKey">
-    <ImagesSearch :tag-ids :is-not-in-album :camera-model />
+    <ImagesSearch :tag-ids :is-not-in-album :camera-model :page-size />
   </main>
 </template>
