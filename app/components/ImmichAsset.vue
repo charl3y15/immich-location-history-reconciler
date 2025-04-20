@@ -2,6 +2,7 @@
 import { AssetMediaSize, viewAsset, type AssetResponseDto } from "@immich/sdk";
 
 const { asset } = defineProps<{ asset: AssetResponseDto }>();
+const timestamp = computed(() => new Date(asset.fileCreatedAt));
 
 const {
   data: imgUrl,
@@ -24,20 +25,25 @@ function revokeUrl() {
 
 <template>
   <Card>
-    <template #content>
+    <template #header>
       <Message v-if="status === 'pending'">Loading...</Message>
       <Message v-else-if="error">{{ error }}</Message>
       <div v-else>
         <!-- TODO: wrap image in <a> to photo on Immich -->
         <img
+          class="max-h-80 w-auto m-auto"
           :src="imgUrl"
-          @load="revokeUrl"
           :height="asset.exifInfo?.exifImageHeight ?? undefined"
           :width="asset.exifInfo?.exifImageWidth ?? undefined"
+          @load="revokeUrl"
         />
-        <p>{{ asset.originalFileName }}</p>
-        <p>{{ new Date(asset.fileCreatedAt).toLocaleString() }}</p>
       </div>
+    </template>
+    <template #title>
+      <p style="overflow-wrap: break-word;">{{ asset.originalFileName }}</p>
+    </template>
+    <template #subtitle>
+      <p>{{ timestamp.toLocaleString() }}</p>
     </template>
   </Card>
 </template>
