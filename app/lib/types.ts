@@ -164,21 +164,35 @@ type TravelMode =
   | "FLYING"
   | "IN_FERRY";
 
+interface UserLocationProfile {
+  frequentPlaces: Array<{
+    placeId: string;
+    /** geo */
+    placeLocation: string;
+    label?: string;
+  }>;
+  persona: {
+    travelModeAffinities: Array<{
+      mode: TravelMode;
+      affinity: number;
+    }>;
+  };
+}
+
 export interface Timeline {
   semanticSegments: SemanticSegment[];
   rawSignals: RawSignal[];
-  userLocationProfile: {
-    frequentPlaces: Array<{
-      placeId: string;
-      /** geo */
-      placeLocation: string;
-      label?: string;
-    }>;
-    persona: {
-      travelModeAffinities: Array<{
-        mode: TravelMode;
-        affinity: number;
-      }>;
-    };
-  };
+  userLocationProfile: UserLocationProfile;
 }
+
+type StringToDate<T> = {
+  [Property in keyof T]: Property extends "startTime" | "endTime" | "time"
+    ? Date
+    : T[Property] extends Array<infer S>
+    ? Array<StringToDate<S>>
+    : T[Property] extends Record<string, unknown>
+    ? StringToDate<T[Property]>
+    : T[Property];
+};
+
+export type TimelineWithDates = StringToDate<Timeline>;
