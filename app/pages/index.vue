@@ -1,22 +1,8 @@
 <script setup lang="ts">
 import type { FileUploadSelectEvent } from "primevue/fileupload";
-import { init } from "@immich/sdk";
 import type { Timeline } from "~/lib/types";
 
-// Server settings
-
-const baseUrl = useLocalStorage("base-url", "");
-const apiKey = useLocalStorage("api-key", "");
-
-watch(
-  [baseUrl, apiKey],
-  ([baseUrl, apiKey]) => {
-    if (baseUrl && apiKey) {
-      init({ baseUrl, apiKey });
-    }
-  },
-  { immediate: true }
-);
+const isServerInited = ref(false);
 
 // Location history export timeline
 
@@ -37,21 +23,8 @@ const pageSize = useLocalStorage("page-size", 10);
 <template>
   <div>
     <header class="grid gap-2">
-      <Panel header="Server configuration" toggleable>
-        <div class="flex gap-4 pt-4">
-          <IftaLabel>
-            <InputText
-              class="w-72"
-              id="base-url"
-              v-model="baseUrl"
-              placeholder="https://immich.example.com/api"
-            />
-            <label for="base-url">Immich API base URL</label>
-          </IftaLabel>
-          <IftaLabel>
-            <InputText id="api-key" v-model="apiKey" />
-            <label for="api-key">Immich API Key</label>
-          </IftaLabel>
+      <ServerConfig @init="({apiKey, baseUrl}) => isServerInited = Boolean(apiKey) && Boolean(baseUrl)">
+        <template #extra>
           <FileUpload
             mode="basic"
             custom-upload
@@ -59,11 +32,10 @@ const pageSize = useLocalStorage("page-size", 10);
             choose-label="Upload Timeline.json"
             @select="uploadTimeline"
           />
-        </div>
-      </Panel>
+        </template>
+      </ServerConfig>
       <Panel
-        v-if="baseUrl && apiKey"
-        :key="baseUrl + apiKey"
+        v-if="isServerInited"
         header="Image search options"
         toggleable
       >
@@ -76,7 +48,7 @@ const pageSize = useLocalStorage("page-size", 10);
       </Panel>
     </header>
   </div>
-  <main v-if="baseUrl && apiKey">
+  <main v-if="isServerInited">
     <ImagesSearch :tag-ids :is-not-in-album :camera-model :page-size />
   </main>
 </template>
