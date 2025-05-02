@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// import { useImagesSearch } from "~/lib/useImmichSearch";
 import {
   searchAssets,
   type ApiHttpError,
@@ -10,7 +9,7 @@ import {
 const { tagIds, isNotInAlbum, cameraModel, pageSize = 10 } = defineProps<{
   tagIds: string[];
   isNotInAlbum: boolean;
-  cameraModel: string;
+  cameraModel: string | null;
   pageSize?: number;
 }>();
 

@@ -8,7 +8,7 @@ import {
 } from "@immich/sdk";
 
 const tagIds = defineModel<string[]>("tagIds", { default: [] });
-const cameraModel = defineModel<string>("cameraModel", { default: "" });
+const cameraModel = defineModel<string | null>("cameraModel", { default: null });
 const isNotInAlbum = defineModel<boolean>("isNotInAlbum", { default: false });
 const pageSize = defineModel<number>("pageSize", { default: 10 });
 
@@ -21,9 +21,15 @@ const {
   data: cameraModels,
   status: cameraStatus,
   error: cameraError,
-} = useAsyncData<string[], ApiHttpError>(
+} = useAsyncData<string[], ApiHttpError, Array<{value: string, label: string}>>(
   () => getSearchSuggestions({ $type: SearchSuggestionType.CameraModel }),
-  { transform: (models) => models.map((model) => model || "Unknown") }
+  {
+    transform: (models) =>
+      models.map((model) => ({
+        value: model,
+        label: model || "Unknown",
+      })),
+  }
 );
 
 const pageOptions = [5, 10, 20, 50].map((count) => ({
@@ -55,6 +61,8 @@ const pageOptions = [5, 10, 20, 50].map((count) => ({
       <Select
         v-model="cameraModel"
         :options="cameraModels"
+        option-label="label"
+        option-value="value"
         placeholder="Camera model"
         :loading="cameraStatus === 'pending'"
         :disabled="isNotInAlbum"
