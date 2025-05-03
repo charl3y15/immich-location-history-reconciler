@@ -142,13 +142,19 @@ interface Position {
 interface WifiScan {
   wifiScan: {
     deliveryTime: string;
-    devicesRecords: any[]; // Couldn't bother
+    devicesRecords: Array<{
+      mac: number;
+      rawRssi: number;
+    }>;
   };
 }
 
 interface ActivityRecord {
   activityRecord: {
-    probableActivities: any[]; // Couldn't bother
+    probableActivities: Array<{
+      type: ActivityType;
+      confidence: number;
+    }>;
     timestamp: string;
   };
 }
