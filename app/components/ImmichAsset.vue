@@ -6,6 +6,7 @@ import {
   type AssetResponseDto,
 } from "@immich/sdk";
 
+const confirmEdit = defineModel<boolean>("confirmEdit", { default: false });
 const { asset } = defineProps<{ asset: AssetResponseDto }>();
 const timestamp = computed(() => new Date(asset.fileCreatedAt));
 const href = computed(
@@ -32,7 +33,7 @@ function revokeUrl() {
 </script>
 
 <template>
-  <Card>
+  <Card :class="{ 'bg-slate-200': confirmEdit }">
     <template #header>
       <Message v-if="status === 'pending'">Loading...</Message>
       <Message v-else-if="error">{{ error }}</Message>
@@ -53,6 +54,17 @@ function revokeUrl() {
     </template>
     <template #subtitle>
       <p>{{ timestamp.toLocaleString() }}</p>
+    </template>
+    <template #content>
+      <slot />
+    </template>
+    <template #footer>
+      <div class="text-end">
+        <label>
+          <span class="align-middle mr-1">Confirm edit?</span>
+          <Checkbox class="align-middle" v-model="confirmEdit" binary />
+        </label>
+      </div>
     </template>
   </Card>
 </template>
