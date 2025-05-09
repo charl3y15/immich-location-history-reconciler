@@ -8,7 +8,9 @@ import {
 } from "@immich/sdk";
 
 const tagIds = defineModel<string[]>("tagIds", { default: [] });
-const cameraModel = defineModel<string | null>("cameraModel", { default: null });
+const cameraModel = defineModel<string | null>("cameraModel", {
+  default: null,
+});
 const isNotInAlbum = defineModel<boolean>("isNotInAlbum", { default: false });
 const pageSize = defineModel<number>("pageSize", { default: 10 });
 
@@ -21,16 +23,17 @@ const {
   data: cameraModels,
   status: cameraStatus,
   error: cameraError,
-} = useAsyncData<string[], ApiHttpError, Array<{value: string, label: string}>>(
-  () => getSearchSuggestions({ $type: SearchSuggestionType.CameraModel }),
-  {
-    transform: (models) =>
-      models.map((model) => ({
-        value: model,
-        label: model || "Unknown",
-      })),
-  }
-);
+} = useAsyncData<
+  string[],
+  ApiHttpError,
+  Array<{ value: string; label: string }>
+>(() => getSearchSuggestions({ $type: SearchSuggestionType.CameraModel }), {
+  transform: (models) =>
+    models.map((model) => ({
+      value: model,
+      label: model || "Unknown",
+    })),
+});
 
 const pageOptions = [5, 10, 20, 50].map((count) => ({
   label: count.toString(),

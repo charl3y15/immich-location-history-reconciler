@@ -5,7 +5,6 @@ const emit = defineEmits<{
   init: [{ baseUrl: string; apiKey: string }];
 }>();
 
-
 const baseUrl = useLocalStorage("base-url", "");
 const apiKey = useLocalStorage("api-key", "");
 
@@ -15,7 +14,7 @@ watch(
     if (baseUrl && apiKey) {
       init({ baseUrl, apiKey });
     }
-    emit('init', {apiKey, baseUrl})
+    emit("init", { apiKey, baseUrl });
   },
   { immediate: true }
 );

@@ -26,14 +26,17 @@ const pageSize = useLocalStorage("page-size", 10);
     <header class="grid gap-2">
       <Panel toggleable collapsed header="README">
         <Message>
-          In the location history, <code>timelinePath</code> segments are given priority due to their precision,
-          followed by <code>activity</code> segments, and lastly <code>visit</code> segments.
+          In the location history, <code>timelinePath</code> segments are given
+          priority due to their precision, followed by
+          <code>activity</code> segments, and lastly
+          <code>visit</code> segments.
           <br />
           After
           <a href="https://github.com/immich-app/immich/pull/17061">
             <code>immich#17061</code>
           </a>
-          is merged, it will be possible to use visually similar images to estimate the location of the image.
+          is merged, it will be possible to use visually similar images to
+          estimate the location of the image.
         </Message>
       </Panel>
       <ServerConfig

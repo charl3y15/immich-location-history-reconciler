@@ -81,10 +81,10 @@ const items = computed(
     <div
       class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
     >
-      <article v-for="{asset, estimatedLocation} in items" :key="asset.id">
+      <article v-for="{ asset, estimatedLocation } in items" :key="asset.id">
         <ImmichAsset :asset>
           <p class="whitespace-pre-line">
-            {{ estimatedLocation?.point ?? 'Unknown location :/' }}
+            {{ estimatedLocation?.point ?? "Unknown location :/" }}
           </p>
         </ImmichAsset>
       </article>

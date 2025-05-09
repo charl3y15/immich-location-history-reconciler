@@ -101,7 +101,7 @@ const updateAssets = async () => {
   try {
     const updatedAssets = await Promise.all(
       toUpdate.value.map(({ asset, filenameDate }) => {
-        asset.exifInfo?.timeZone
+        asset.exifInfo?.timeZone;
 
         return updateAsset({
           id: asset.id,
@@ -119,6 +119,9 @@ const updateAssets = async () => {
     loading.value = false;
   }
 };
+
+// TODO: detect dates that repeat a lot in mismatched assets and flag them.
+// It is possible that there are other images uploaded together that do not have a timestamp in the filename.
 </script>
 
 <template>
@@ -147,18 +150,20 @@ const updateAssets = async () => {
         <Message class="mt-2" severity="warn">
           Note: this fixes only the data in Immich's database, not in the
           original image files. After
-          <a href="https://github.com/immich-app/immich/pull/17061"
-            ><code>immich#17061</code></a
-          >
+          <a href="https://github.com/immich-app/immich/pull/17061">
+            <code>immich#17061</code>
+          </a>
           gets merged, it would be possible to use similar images as an
           information source as well.
         </Message>
       </Panel>
-      <ServerConfig />
+      <ServerConfig class="mt-2" />
     </header>
     <main class="mt-4">
       <section class="flex gap-6">
-        <Button @click="downloadAssets" :disabled="loading">Download all assets metadata</Button>
+        <Button @click="downloadAssets" :disabled="loading">
+          Download all assets metadata
+        </Button>
         <FileUpload
           choose-label="Upload assets.json"
           mode="basic"
@@ -199,7 +204,7 @@ const updateAssets = async () => {
           >
             Check all
           </Checkbox>
-          <label for="toggleAll">{{ allChecked ? 'Unc' : 'C' }}heck all</label>
+          <label for="toggleAll">{{ allChecked ? "Unc" : "C" }}heck all</label>
         </div>
       </section>
       <section class="mt-4 grid gap-4 grid-cols-5">
@@ -230,7 +235,7 @@ const updateAssets = async () => {
     </main>
     <footer v-if="toUpdate.length" class="mt-4">
       <Button :disabled="loading" @click="updateAssets">
-        Confirm {{ toUpdate.length }} edit{{ toUpdate.length === 1 ? '' : 's' }}
+        Confirm {{ toUpdate.length }} edit{{ toUpdate.length === 1 ? "" : "s" }}
       </Button>
     </footer>
   </div>
