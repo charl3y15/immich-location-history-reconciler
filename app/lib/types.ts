@@ -45,7 +45,7 @@ interface SegmentBase {
   endTime: string;
 }
 
-interface PathSegment extends SegmentBase {
+export interface PathSegment extends SegmentBase {
   timelinePath: Array<{
     /** Format: "30.0485295°, 31.3557779°" */
     point: string;
@@ -63,7 +63,7 @@ type SemanticType =
   | "SEARCHED_ADDRESS"
   | "INFERRED_HOME";
 
-interface VisitSegment extends SegmentBase {
+export interface VisitSegment extends SegmentBase {
   startTimeTimezoneUtcOffsetMinutes: number;
   endTimeTimezoneUtcOffsetMinutes: number;
   visit: {
@@ -98,7 +98,7 @@ type ActivityType =
   | "SKIING"
   | "MOTORCYCLING";
 
-interface ActivitySegment extends SegmentBase {
+export interface ActivitySegment extends SegmentBase {
   startTimeTimezoneUtcOffsetMinutes: number;
   endTimeTimezoneUtcOffsetMinutes: number;
   activity: {
@@ -109,7 +109,7 @@ interface ActivitySegment extends SegmentBase {
   };
 }
 
-interface TimelineMemory extends SegmentBase {
+export interface TimelineMemory extends SegmentBase {
   timelineMemory: {
     trip: {
       distanceFromOriginKms: number;
@@ -122,7 +122,7 @@ interface TimelineMemory extends SegmentBase {
   };
 }
 
-type SemanticSegment =
+export type SemanticSegment =
   | PathSegment
   | VisitSegment
   | ActivitySegment
@@ -191,7 +191,7 @@ export interface Timeline {
   userLocationProfile: UserLocationProfile;
 }
 
-type StringToDate<T> = {
+export type StringToDate<T> = {
   [Property in keyof T]: Property extends "startTime" | "endTime" | "time"
     ? Date
     : T[Property] extends Array<infer S>

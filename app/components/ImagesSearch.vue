@@ -2,18 +2,28 @@
 import {
   searchAssets,
   type ApiHttpError,
-  type MetadataSearchDto,
   type SearchResponseDto,
 } from "@immich/sdk";
+import { useTimeline } from "~/lib/timeline";
 
-const { tagIds, isNotInAlbum, cameraModel, pageSize = 10 } = defineProps<{
+const {
+  tagIds,
+  isNotInAlbum,
+  cameraModel,
+  pageSize = 10,
+} = defineProps<{
   tagIds: string[];
   isNotInAlbum: boolean;
   cameraModel: string | null;
   pageSize?: number;
 }>();
 
-// TODO pagination
+// TODO: maybe paginate using `takenAfter` time somehow?
+// Or contribute a a PR to immich to add pagination support using `after` asset id.
+// Decision for now: button to "load more" images, and reset page to 1 upon committing location updates
+
+const { estimateLocationAtTime } = useTimeline();
+
 const { data: result, error } = useAsyncData<
   SearchResponseDto,
   ApiHttpError,
@@ -37,9 +47,25 @@ const { data: result, error } = useAsyncData<
       },
     }),
   {
-    watch: [() => tagIds, () => isNotInAlbum, () => cameraModel, () => pageSize],
-    transform: ({ assets }) => assets,
+    watch: [
+      () => tagIds,
+      () => isNotInAlbum,
+      () => cameraModel,
+      () => pageSize,
+    ],
+    transform: ({ assets }) => ({
+      ...assets,
+      items: assets.items.map((asset) => asset),
+    }),
   }
+);
+
+const items = computed(
+  () =>
+    result.value?.items.map((item) => ({
+      asset: item,
+      estimatedLocation: estimateLocationAtTime(new Date(item.fileCreatedAt)),
+    })) ?? []
 );
 </script>
 
@@ -52,9 +78,15 @@ const { data: result, error } = useAsyncData<
       <!-- TODO: implement pagination -->
       <Button>Next page</Button>
     </header>
-    <div class="grid grid-cols-5 gap-4">
-      <article v-for="asset in result?.items" :key="asset.id">
-        <ImmichAsset :asset />
+    <div
+      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+    >
+      <article v-for="{asset, estimatedLocation} in items" :key="asset.id">
+        <ImmichAsset :asset>
+          <p class="whitespace-pre-line">
+            {{ estimatedLocation?.point ?? 'Unknown location :/' }}
+          </p>
+        </ImmichAsset>
       </article>
     </div>
   </section>

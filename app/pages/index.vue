@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import type { FileUploadSelectEvent } from "primevue/fileupload";
-import type { Timeline } from "~/lib/types";
+import { useTimeline } from "~/lib/timeline";
 
 const isServerInited = ref(false);
 
 // Location history export timeline
 
+const { setTimeline } = useTimeline();
+
 async function uploadTimeline(event: FileUploadSelectEvent) {
   const file: File = event.files[0];
-  const timeline: Timeline = JSON.parse(await file.text());
-  console.log(timeline.semanticSegments.length);
+  setTimeline(JSON.parse(await file.text()));
 }
 
 // Filters
@@ -23,7 +24,24 @@ const pageSize = useLocalStorage("page-size", 10);
 <template>
   <div>
     <header class="grid gap-2">
-      <ServerConfig @init="({apiKey, baseUrl}) => isServerInited = Boolean(apiKey) && Boolean(baseUrl)">
+      <Panel toggleable collapsed header="README">
+        <Message>
+          In the location history, <code>timelinePath</code> segments are given priority due to their precision,
+          followed by <code>activity</code> segments, and lastly <code>visit</code> segments.
+          <br />
+          After
+          <a href="https://github.com/immich-app/immich/pull/17061">
+            <code>immich#17061</code>
+          </a>
+          is merged, it will be possible to use visually similar images to estimate the location of the image.
+        </Message>
+      </Panel>
+      <ServerConfig
+        @init="
+          ({ apiKey, baseUrl }) =>
+            (isServerInited = Boolean(apiKey) && Boolean(baseUrl))
+        "
+      >
         <template #extra>
           <FileUpload
             mode="basic"
@@ -34,17 +52,16 @@ const pageSize = useLocalStorage("page-size", 10);
           />
         </template>
       </ServerConfig>
-      <Panel
-        v-if="isServerInited"
-        header="Image search options"
-        toggleable
-      >
-        <Filters
-          v-model:cameraModel="cameraModel"
-          v-model:tagIds="tagIds"
-          v-model:isNotInAlbum="isNotInAlbum"
-          v-model:page-size="pageSize"
-        />
+      <Panel v-if="isServerInited" header="Configuration" toggleable>
+        <div>
+          <h2 class="text-lg font-semibold">Image search options</h2>
+          <Filters
+            v-model:cameraModel="cameraModel"
+            v-model:tagIds="tagIds"
+            v-model:isNotInAlbum="isNotInAlbum"
+            v-model:page-size="pageSize"
+          />
+        </div>
       </Panel>
     </header>
   </div>

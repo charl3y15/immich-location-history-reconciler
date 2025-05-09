@@ -33,7 +33,10 @@ function revokeUrl() {
 </script>
 
 <template>
-  <Card :class="{ 'bg-slate-200': confirmEdit }">
+  <Card
+    :class="{ 'bg-slate-200': confirmEdit, 'h-full': true }"
+    :pt="{ body: { class: 'flex-grow justify-between' } }"
+  >
     <template #header>
       <Message v-if="status === 'pending'">Loading...</Message>
       <Message v-else-if="error">{{ error }}</Message>
