@@ -7,7 +7,10 @@ import {
 } from "@immich/sdk";
 
 const confirmEdit = defineModel<boolean>("confirmEdit", { default: false });
-const { asset } = defineProps<{ asset: AssetResponseDto }>();
+const { asset, disableConfirm = false } = defineProps<{
+  asset: AssetResponseDto;
+  disableConfirm?: boolean;
+}>();
 const timestamp = computed(() => new Date(asset.fileCreatedAt));
 const href = computed(
   () => new URL(apiOptions.baseUrl).origin + "/photos/" + asset.id
@@ -53,7 +56,12 @@ const imgUrl = useObjectUrl(data);
       <div class="text-end">
         <label>
           <span class="align-middle mr-1">Confirm edit?</span>
-          <Checkbox class="align-middle" v-model="confirmEdit" binary />
+          <Checkbox
+            class="align-middle"
+            v-model="confirmEdit"
+            :disabled="disableConfirm"
+            binary
+          />
         </label>
       </div>
     </template>

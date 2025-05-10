@@ -17,6 +17,7 @@
     "@primevue/forms": "^4.3.4",
     "@vueuse/core": "^13.1.0",
     "eslint": "^9.26.0",
+    "leaflet": "^1.9.4",
     "nuxt": "^3.17.2",
     "primevue": "^4.3.4",
     "tailwindcss-primeui": "^0.6.1",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@primevue/nuxt-module": "^4.3.4",
+    "@types/leaflet": "^1.9.17",
     "@vueuse/nuxt": "^13.1.0"
   }
 }

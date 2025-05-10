@@ -12,7 +12,7 @@ const timeline = shallowRef<TimelineWithDates>();
 
 type Segment = StringToDate<SemanticSegment>;
 
-type LatLng = {
+export type LatLng = {
   lat: number;
   lng: number;
 };
@@ -22,7 +22,7 @@ export type LocationPoint = {
   time: Date;
 };
 
-function parseLatLng(latLng: string): LatLng {
+export function parseLatLng(latLng: string): LatLng {
   const [lat, lng] = latLng
     .split(", ")
     .map((part) => Number(part.replace("°", "")));
@@ -76,44 +76,6 @@ function interpolateLocation(
 
 const segmentContainsDate = (segment: Segment, timestamp: Date): boolean => {
   return segment.startTime <= timestamp && timestamp <= segment.endTime;
-};
-
-const findSegmentsContaining = (timestamp: Date): Segment[] => {
-  const segments = timeline.value?.semanticSegments;
-  if (segments == null) return [];
-
-  let low = 0;
-  let high = segments.length;
-
-  // Binary search to find the first startTime greater than timestamp
-  while (low < high) {
-    const mid = Math.floor((low + high) / 2);
-    if (segments[mid].startTime > timestamp) {
-      high = mid;
-    } else {
-      low = mid + 1;
-    }
-  }
-  // Index of first segment that starts after the given timestamp
-  const highIndex = low;
-  // Index of first segment that contains the given timestamp
-  let lowIndex = highIndex - 1;
-
-  // Go back in the timeline, adding segments that contain the timestamp (usually only one, but could be more)
-  while (lowIndex >= 0 && segmentContainsDate(segments[lowIndex], timestamp)) {
-    lowIndex--;
-  }
-
-  if (lowIndex === highIndex - 1) {
-    // No segments found that contain the timestamp
-    // Maybe return the one before and after?
-    // Depending on whether we value accuracy more or just having some data
-    // probably using an option like: use surrounding segments if no overlap found
-    // To be combined with an option like: maximum time difference to consider
-    // In that case, provide options: use start, use end, use midpoint, ignore
-  }
-
-  return segments.slice(lowIndex + 1, highIndex);
 };
 
 const findRawSignalsContaining = () => {
@@ -250,11 +212,51 @@ export function useTimeline() {
     };
   };
 
+  const findSegmentsContaining = (timestamp: Date): Segment[] => {
+    const segments = timeline.value?.semanticSegments;
+    if (segments == null) return [];
+
+    let low = 0;
+    let high = segments.length;
+
+    // Binary search to find the first startTime greater than timestamp
+    while (low < high) {
+      const mid = Math.floor((low + high) / 2);
+      if (segments[mid].startTime > timestamp) {
+        high = mid;
+      } else {
+        low = mid + 1;
+      }
+    }
+    // Index of first segment that starts after the given timestamp
+    const highIndex = low;
+    // Index of first segment that contains the given timestamp
+    let lowIndex = highIndex - 1;
+
+    // Go back in the timeline, adding segments that contain the timestamp (usually only one, but could be more)
+    while (
+      lowIndex >= 0 &&
+      segmentContainsDate(segments[lowIndex], timestamp)
+    ) {
+      lowIndex--;
+    }
+
+    if (lowIndex === highIndex - 1) {
+      // No segments found that contain the timestamp
+      // Maybe return the one before and after?
+      // Depending on whether we value accuracy more or just having some data
+      // probably using an option like: use surrounding segments if no overlap found
+      // To be combined with an option like: maximum time difference to consider
+      // In that case, provide options: use start, use end, use midpoint, ignore
+    }
+
+    return segments.slice(lowIndex + 1, highIndex);
+  };
+
   const estimateLocationAtTime = (timestamp: Date) => {
     if (!timeline.value) return null;
 
     const segments = findSegmentsContaining(timestamp);
-    if (segments.length === 0) return null;
 
     /*
      * There are 4 types of segments: timelinePath, visit, activity, and timelineMemory.
@@ -271,17 +273,27 @@ export function useTimeline() {
 
     const pathSegments = segments.filter((seg) => "timelinePath" in seg);
     if (pathSegments.length) {
-      return estimatePointFromSegments(timestamp, pathSegments);
+      return {
+        bestEstimate: estimatePointFromSegments(timestamp, pathSegments),
+        segments,
+        estimateSource: "timelinePath" as const,
+      };
     }
 
     // Otherwise, just return the average of all other data (TODO: improve upon this somehow)
-    return estimatePointFromSegments(timestamp, segments);
+    return {
+      bestEstimate: estimatePointFromSegments(timestamp, segments),
+      segments,
+      estimateSource: "others" as const,
+    };
   };
 
   // TODO: wrap result of functions in "computed" based on timeline
 
   return {
     setTimeline,
+    timeline: readonly(timeline),
     estimateLocationAtTime,
+    findSegmentsContaining,
   };
 }
