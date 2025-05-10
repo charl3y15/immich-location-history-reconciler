@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import {
-  searchAssets,
-  type ApiHttpError,
-  type SearchResponseDto,
-} from "@immich/sdk";
+import { searchAssets, type AssetResponseDto } from "@immich/sdk";
 import { useTimeline } from "~/lib/timeline";
 
 const {
@@ -24,13 +20,23 @@ const {
 
 const { estimateLocationAtTime } = useTimeline();
 
-const { data: result, error } = useAsyncData<
-  SearchResponseDto,
-  ApiHttpError,
-  SearchResponseDto["assets"]
->(
-  () =>
-    searchAssets({
+type TransformedSearchResponse = {
+  assets: AssetResponseDto[];
+  hasNextPage: boolean;
+};
+
+const page = ref(1); // Note: cannot decrease page without clearing results first. Only increment.
+const {
+  data: result,
+  status,
+  error,
+  clear,
+  execute,
+} = useAsyncData(
+  (async () => {
+    const previousAssets = result.value?.assets ?? [];
+
+    const { assets } = await searchAssets({
       metadataSearchDto: {
         // No location
         country: "",
@@ -44,25 +50,33 @@ const { data: result, error } = useAsyncData<
 
         // Pagination
         size: pageSize,
+        page: page.value,
       },
-    }),
+    });
+
+    return {
+      assets: [...previousAssets, ...assets.items],
+      hasNextPage: assets.nextPage != null,
+    };
+  }) as () => Promise<TransformedSearchResponse>,
   {
-    watch: [
-      () => tagIds,
-      () => isNotInAlbum,
-      () => cameraModel,
-      () => pageSize,
-    ],
-    transform: ({ assets }) => ({
-      ...assets,
-      items: assets.items.map((asset) => asset),
-    }),
+    watch: [page],
+  }
+);
+
+watch(
+  [() => tagIds, () => isNotInAlbum, () => cameraModel, () => pageSize],
+  () => {
+    // Reset page to 1 if any of the search parameters (other than page) changed
+    clear();
+    page.value = 1;
+    execute();
   }
 );
 
 const items = computed(
   () =>
-    result.value?.items.map((item) => ({
+    result.value?.assets.map((item) => ({
       asset: item,
       estimatedLocation: estimateLocationAtTime(new Date(item.fileCreatedAt)),
     })) ?? []
@@ -74,10 +88,6 @@ const items = computed(
     {{ error }}
   </Message>
   <section v-else>
-    <header>
-      <!-- TODO: implement pagination -->
-      <Button>Next page</Button>
-    </header>
     <div
       class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
     >
@@ -92,5 +102,17 @@ const items = computed(
         <Message>No images found</Message>
       </article>
     </div>
+    <footer class="flex justify-end gap-3 mt-3">
+      <Message v-if="status !== 'success'">
+        <p>{{ status }}...</p>
+      </Message>
+      <Button
+        @click="page++"
+        :disabled="!result?.hasNextPage || status === 'pending'"
+      >
+        Load more items
+      </Button>
+      <Button>Save changes</Button>
+    </footer>
   </section>
 </template>
