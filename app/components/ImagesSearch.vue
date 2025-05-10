@@ -23,7 +23,8 @@ type TransformedSearchResponse = {
 };
 
 const page = ref(1); // Note: cannot decrease page without clearing results first. Only increment.
-const {
+// var instead of const to access "result" inside the function body
+var {
   data: result,
   status,
   error,
@@ -31,7 +32,7 @@ const {
   execute,
 } = useAsyncData(
   (async () => {
-    const previousAssets = result.value?.assets ?? [];
+    const previousAssets = result?.value?.assets ?? [];
 
     const { assets } = await searchAssets({
       metadataSearchDto: {
