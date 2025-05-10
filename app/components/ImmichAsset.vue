@@ -13,23 +13,11 @@ const href = computed(
   () => new URL(apiOptions.baseUrl).origin + "/photos/" + asset.id
 );
 
-const {
-  data: imgUrl,
-  status,
-  error,
-} = useAsyncData(
-  asset.id,
-  () => viewAsset({ id: asset.id, size: AssetMediaSize.Thumbnail }),
-  {
-    transform: window.URL.createObjectURL,
-  }
+const { data, status, error } = useAsyncData(asset.id, () =>
+  viewAsset({ id: asset.id, size: AssetMediaSize.Thumbnail })
 );
 
-function revokeUrl() {
-  if (imgUrl.value) {
-    window.URL.revokeObjectURL(imgUrl.value);
-  }
-}
+const imgUrl = useObjectUrl(data);
 </script>
 
 <template>
@@ -48,7 +36,6 @@ function revokeUrl() {
             :src="imgUrl"
             :height="asset.exifInfo?.exifImageHeight ?? undefined"
             :width="asset.exifInfo?.exifImageWidth ?? undefined"
-            @load="revokeUrl"
           />
         </a>
       </div>
