@@ -70,7 +70,7 @@ const items = computed(
 </script>
 
 <template>
-  <Message v-if="error">
+  <Message v-if="error" severity="error">
     {{ error }}
   </Message>
   <section v-else>
@@ -87,6 +87,9 @@ const items = computed(
             {{ estimatedLocation?.point ?? "Unknown location :/" }}
           </p>
         </ImmichAsset>
+      </article>
+      <article v-if="items.length === 0" class="col-span-full">
+        <Message>No images found</Message>
       </article>
     </div>
   </section>

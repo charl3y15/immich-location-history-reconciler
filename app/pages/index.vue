@@ -68,7 +68,7 @@ const pageSize = useLocalStorage("page-size", 10);
       </Panel>
     </header>
   </div>
-  <main v-if="isServerInited">
+  <main v-if="isServerInited" class="mt-4">
     <ImagesSearch :tag-ids :is-not-in-album :camera-model :page-size />
   </main>
 </template>

@@ -34,7 +34,8 @@ function revokeUrl() {
 
 <template>
   <Card
-    :class="{ 'bg-slate-200': confirmEdit, 'h-full': true }"
+    :class="{ 'bg-slate-200': confirmEdit }"
+    class="h-full overflow-hidden"
     :pt="{ body: { class: 'flex-grow justify-between' } }"
   >
     <template #header>
