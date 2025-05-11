@@ -3,7 +3,7 @@ import { onMounted, ref } from "vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { LatLng } from "~/lib/timeline";
-import { segmentToGeometry, type Geometry } from "~/lib/geometry";
+import { type Geometry } from "~/lib/geometry";
 
 const bestLocation = defineModel<LatLng>();
 
@@ -64,6 +64,7 @@ watch(
     if (!map) return;
 
     sourceSegmentsLayer.clearLayers();
+    const bounds: L.LatLngTuple[] = [];
 
     segments.forEach((segment) => {
       switch (segment.type) {
@@ -88,6 +89,12 @@ watch(
             }).bindPopup(time.toLocaleString())
           );
           circles.forEach((circle) => sourceSegmentsLayer.addLayer(circle));
+
+          bounds.push(
+            ...segment.points.map(
+              ({ point: { lat, lng } }) => [lat, lng] satisfies L.LatLngTuple
+            )
+          );
 
           break;
         }
@@ -116,6 +123,11 @@ watch(
           sourceSegmentsLayer.addLayer(startCircle);
           sourceSegmentsLayer.addLayer(endCircle);
 
+          bounds.push(
+            [start.point.lat, start.point.lng],
+            [end.point.lat, end.point.lng]
+          );
+
           break;
         }
         case "visit": {
@@ -125,10 +137,17 @@ watch(
             { maxWidth: 200 }
           );
           sourceSegmentsLayer.addLayer(marker);
+
+          bounds.push([point.lat, point.lng]);
+
           break;
         }
       }
     });
+
+    if (bounds.length) {
+      map.fitBounds(bounds);
+    }
   },
   { immediate: true }
 );
