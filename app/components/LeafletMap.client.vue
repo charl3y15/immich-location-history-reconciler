@@ -1,9 +1,18 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import L from "leaflet";
+import markerIconSrc from "leaflet/dist/images/marker-icon.png";
+import markerIconRetinaSrc from "leaflet/dist/images/marker-icon-2x.png";
+import markerShadowSrc from "leaflet/dist/images/marker-shadow.png";
 import "leaflet/dist/leaflet.css";
 import type { LatLng } from "~/lib/timeline";
 import { type Geometry } from "~/lib/geometry";
+
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIconSrc,
+  iconRetinaUrl: markerIconRetinaSrc,
+  shadowUrl: markerShadowSrc,
+});
 
 const bestLocation = defineModel<LatLng>();
 
@@ -34,7 +43,9 @@ onMounted(() => {
   });
 });
 
-const redMarkerIcon = new L.Icon.Default({ className: "hue-rotate-[120deg]" });
+const redMarkerIcon = new L.Icon.Default({
+  className: "hue-rotate-[120deg]",
+});
 
 watch(
   [bestLocation, map],
