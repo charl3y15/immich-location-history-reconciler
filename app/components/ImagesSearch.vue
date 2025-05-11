@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { searchAssets, type AssetResponseDto } from "@immich/sdk";
+import { searchAssets, updateAsset, type AssetResponseDto } from "@immich/sdk";
 import { segmentToGeometry, type Geometry } from "~/lib/geometry";
 import { useTimeline, type LatLng } from "~/lib/timeline";
 
@@ -122,16 +122,40 @@ const confirmedUpdates = computed(() =>
   Object.values(updates.value).filter((item) => item.confirmEdit)
 );
 
-function confirm() {
-  // TODO: save changes to the server
+const loading = ref(false);
+async function confirm() {
+  loading.value = true;
+  try {
+    await Promise.all(
+      confirmedUpdates.value.map((item) =>
+        updateAsset({
+          id: item.asset.id,
+          updateAssetDto: {
+            latitude: item.estimatedLocation!.lat,
+            longitude: item.estimatedLocation!.lng,
+          },
+        })
+      )
+    );
+  } catch (error) {
+    alert("Error saving changes");
+    console.error(error);
+    return;
+  } finally {
+    loading.value = false;
+  }
+
   clear();
-  // Reset back to the first page that would now contain unseen assets.
   updates.value = {};
+  // Reset back to the first page that would now contain unseen assets.
   page.value =
     Math.ceil(
       (items.value.length - confirmedUpdates.value.length) / pageSize
     ) || 1;
-  execute();
+  setTimeout(() => {
+    // Give some time for the reverse geo-coding to finish
+    execute();
+  }, 500);
 }
 </script>
 
@@ -144,7 +168,9 @@ function confirm() {
       <article v-for="{ asset } in updates" :key="asset.id">
         <ImmichAsset
           :asset
-          :disable-confirm="updates[asset.id].estimatedLocation == null"
+          :disable-confirm="
+            updates[asset.id].estimatedLocation == null || loading
+          "
           v-model:confirm-edit="updates[asset.id].confirmEdit"
         >
           <Message v-if="timeline == null" severity="info">
@@ -168,11 +194,14 @@ function confirm() {
       </Message>
       <Button
         @click="page++"
-        :disabled="!result?.hasNextPage || status === 'pending'"
+        :disabled="!result?.hasNextPage || status === 'pending' || loading"
       >
         Load more items
       </Button>
-      <Button :disabled="confirmedUpdates.length === 0" @click="confirm">
+      <Button
+        :disabled="confirmedUpdates.length === 0 || loading"
+        @click="confirm"
+      >
         Save {{ confirmedUpdates.length }} change{{
           confirmedUpdates.length === 1 ? "" : "s"
         }}
