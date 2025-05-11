@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: "20"
       - run: pnpm install
-      - run: pnpx nuxt build --preset github_pages
+      - run: NUXT_APP_BASE_URL=/immich-location-history-reconciler/ pnpx nuxt build --preset github_pages
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
