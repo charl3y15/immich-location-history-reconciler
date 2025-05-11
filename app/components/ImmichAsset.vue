@@ -25,7 +25,7 @@ const imgUrl = useObjectUrl(data);
 
 <template>
   <Card
-    :class="{ 'bg-slate-200': confirmEdit }"
+    :class="{ '!bg-slate-200': confirmEdit }"
     class="h-full overflow-hidden"
     :pt="{ body: { class: 'flex-grow justify-between' } }"
   >
