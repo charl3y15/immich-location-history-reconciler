@@ -25,7 +25,7 @@ Follow the instructions [here](https://support.google.com/maps/thread/264641290?
 Then, you can filter the images you want to fix by tag and camera model (open an issue if you want to add more filters), and you will see a map under each image with the estimated location based on your location history.
 It also shows the information from your location history that was used to estimate the location.
 
-> [!INFO]
+> [!NOTE]
 > The estimation is indicated by a red marker. You can click anywhere on the map to set the location manually.
 > Blue markers show visited places, blue lines show activities (walking, cycling, ...), and red paths show exact points you've been at a given time (this is the most accurate source).
 
