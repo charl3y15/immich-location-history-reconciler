@@ -68,7 +68,6 @@ const pageOptions = [5, 10, 20, 50].map((count) => ({
         option-value="value"
         placeholder="Camera model"
         :loading="cameraStatus === 'pending'"
-        :disabled="isNotInAlbum"
         show-clear
         filter
       />
