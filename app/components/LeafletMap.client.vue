@@ -8,11 +8,13 @@ import "leaflet/dist/leaflet.css";
 import type { LatLng } from "~/lib/timeline";
 import { type Geometry } from "~/lib/geometry";
 
-L.Icon.Default.mergeOptions({
-  iconUrl: markerIconSrc,
-  iconRetinaUrl: markerIconRetinaSrc,
-  shadowUrl: markerShadowSrc,
-});
+if (!import.meta.dev) {
+  L.Icon.Default.mergeOptions({
+    iconUrl: markerIconSrc,
+    iconRetinaUrl: markerIconRetinaSrc,
+    shadowUrl: markerShadowSrc,
+  });
+}
 
 const bestLocation = defineModel<LatLng>();
 
