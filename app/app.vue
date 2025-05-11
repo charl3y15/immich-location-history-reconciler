@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { NuxtLink } from "#components";
 
+const { baseURL } = useNuxtApp().$config.app;
+
 useHead({
   title: "Immich location fixer",
-  link: [{ rel: "icon", href: "/logo.png" }],
+  link: [{ rel: "icon", href: baseURL + 'logo.png' }],
 });
 </script>
 
