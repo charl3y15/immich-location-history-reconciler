@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { NuxtLink } from "#components";
+
+useHead({
+  title: "Immich location fixer",
+  link: [{ rel: "icon", href: "/logo.png" }],
+});
 </script>
 
 <template>

@@ -4,6 +4,10 @@ import type { FileUploadSelectEvent } from "primevue";
 import { getAllAssets } from "~/lib/downloader";
 import { getTimestampFromFilename } from "~/lib/timestamps";
 
+useHead({
+  title: "Immich timestamp fixer",
+});
+
 const loading = ref(false);
 const threshold = useLocalStorage("timestamp-threshold", 24);
 const thresholdInfo = templateRef("thresholdInfo");
