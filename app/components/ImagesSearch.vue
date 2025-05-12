@@ -138,20 +138,25 @@ async function confirm() {
       )
     );
   } catch (error) {
-    alert("Error saving changes");
+    alert("Error saving changes, check the console");
     console.error(error);
     return;
   } finally {
     loading.value = false;
   }
 
+  const totalItemsCount = items.value.length;
+  const confirmedUpdatesCount = confirmedUpdates.value.length;
+
   clear();
   updates.value = {};
   // Reset back to the first page that would now contain unseen assets.
   page.value =
-    Math.ceil(
-      (items.value.length - confirmedUpdates.value.length) / pageSize
-    ) || 1;
+    Math.ceil((totalItemsCount - confirmedUpdatesCount) / pageSize) || 1;
+
+  alert(
+    "Locations saved, but it may take some time for Immich to finish reverse-geocoding. Please reload the page if you see images you already confirmed"
+  );
   setTimeout(() => {
     // Give some time for the reverse geo-coding to finish
     execute();
