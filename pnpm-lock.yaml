@@ -29,6 +29,9 @@ importers:
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
+      leaflet-geosearch:
+        specifier: ^4.2.0
+        version: 4.2.0
       nuxt:
         specifier: ^3.17.2
         version: 3.17.2(@parcel/watcher@2.5.1)(@types/node@22.15.17)(db0@0.3.2)(eslint@9.26.0(jiti@2.4.2))(ioredis@5.6.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.40.2)(terser@5.39.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1)
@@ -439,6 +442,9 @@ packages:
 
   '@fastify/busboy@3.1.1':
     resolution: {integrity: sha512-5DGmA8FTdB2XbDeEwc/5ZXBl6UbBAyBOOLlPuBnZ/N1SwdH9Ii+cOX3tBROlDgcTXxjOYnLMVoKk9+FXAw0CJw==}
+
+  '@googlemaps/js-api-loader@1.16.8':
+    resolution: {integrity: sha512-CROqqwfKotdO6EBjZO/gQGVTbeDps5V7Mt9+8+5Q+jTg5CRMi3Ii/L9PmV3USROrt2uWxtGzJHORmByxyo9pSQ==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2983,6 +2989,9 @@ packages:
     resolution: {integrity: sha512-b94GiNHQNy6JNTrt5w6zNyffMrNkXZb3KTkCZJb2V1xaEGCk093vkZ2jk3tpaeP33/OiXC+WvK9AxUebnf5nbw==}
     engines: {node: '>= 0.6.3'}
 
+  leaflet-geosearch@4.2.0:
+    resolution: {integrity: sha512-UWNhFSaUcLlAP5UQY75ziWCl3cp0UCcmcFczPHLHjuAVPOHoPTe0nSgHJuI3pSTJBQm46NYoZOlgonrWceUznQ==}
+
   leaflet@1.9.4:
     resolution: {integrity: sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==}
 
@@ -5262,6 +5271,9 @@ snapshots:
       levn: 0.4.1
 
   '@fastify/busboy@3.1.1': {}
+
+  '@googlemaps/js-api-loader@1.16.8':
+    optional: true
 
   '@humanfs/core@0.19.1': {}
 
@@ -8262,6 +8274,11 @@ snapshots:
   lazystream@1.0.1:
     dependencies:
       readable-stream: 2.3.8
+
+  leaflet-geosearch@4.2.0:
+    optionalDependencies:
+      '@googlemaps/js-api-loader': 1.16.8
+      leaflet: 1.9.4
 
   leaflet@1.9.4: {}
 

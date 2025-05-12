@@ -5,6 +5,8 @@ import markerIconSrc from "leaflet/dist/images/marker-icon.png";
 import markerIconRetinaSrc from "leaflet/dist/images/marker-icon-2x.png";
 import markerShadowSrc from "leaflet/dist/images/marker-shadow.png";
 import "leaflet/dist/leaflet.css";
+import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
+import "leaflet-geosearch/assets/css/leaflet.css";
 import type { LatLng } from "~/lib/timeline";
 import { type Geometry } from "~/lib/geometry";
 
@@ -28,9 +30,13 @@ const map = ref<L.Map>();
 let bestLocationMarker: L.Marker | undefined;
 const sourceSegmentsLayer = L.layerGroup();
 
+const provider = new OpenStreetMapProvider();
+const searchControl = GeoSearchControl({ provider: provider, showMarker: false });
+
 onMounted(() => {
   map.value = L.map(mapContainer.value).setView([0, 0], 0);
   map.value.attributionControl.setPrefix("Leaflet");
+  map.value.addControl(searchControl);
 
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
