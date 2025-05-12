@@ -61,7 +61,14 @@ watch(
         map.setView(location, 15);
         bestLocationMarker = L.marker(location, {
           icon: redMarkerIcon,
+          draggable: true,
+          autoPan: true,
         }).addTo(map);
+        bestLocationMarker.on("dragend", () => {
+          if (!bestLocationMarker) return;
+          const latLng = bestLocationMarker.getLatLng();
+          bestLocationMarker.setLatLng(latLng);
+        });
       }
     } else if (bestLocationMarker) {
       bestLocationMarker.remove();
