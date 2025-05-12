@@ -66,3 +66,4 @@ pnpm dev
 - Add more filters to the location fixer (e.g. by date, semantic search, etc.)
 - Dark mode
 - [Location guessing using ChatGPT](https://danq.me/2025/04/17/chatgpt-beats-geoguessr/)?
+- Ability to group photos and assign a single location to all of them

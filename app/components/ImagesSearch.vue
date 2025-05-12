@@ -96,7 +96,10 @@ const allAssets = useArrayMap<AssetResponseDto, Item>(
       geometry: segments
         .map(segmentToGeometry)
         .filter((geometry) => geometry != null),
-      confirmEdit: bestEstimate != null && estimateSource === "timelinePath",
+      confirmEdit:
+        bestEstimate != null &&
+        estimateSource === "timelinePath" &&
+        !asset.originalFileName.toLowerCase().includes("screenshot"),
     };
   }
 );
