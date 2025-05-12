@@ -79,7 +79,9 @@ type Item = {
   confirmEdit: boolean;
 };
 
-const items = useArrayMap<AssetResponseDto, Item>(
+const alreadySeen = useLocalStorage<Set<string>>("already-seen", new Set());
+
+const allAssets = useArrayMap<AssetResponseDto, Item>(
   () => result.value?.assets ?? [],
   (asset) => {
     const {
@@ -97,6 +99,14 @@ const items = useArrayMap<AssetResponseDto, Item>(
       confirmEdit: bestEstimate != null && estimateSource === "timelinePath",
     };
   }
+);
+
+const items = useArrayFilter(
+  allAssets,
+  ({ asset }) => !alreadySeen.value.has(asset.id)
+);
+const alreadySeenCount = computed(
+  () => allAssets.value.length - items.value.length
 );
 
 const updates = ref<Record<string, Item>>({});
@@ -123,7 +133,7 @@ const confirmedUpdates = computed(() =>
 );
 
 const loading = ref(false);
-async function confirm() {
+async function confirm({ hideRest = false } = {}) {
   loading.value = true;
   try {
     await Promise.all(
@@ -148,6 +158,15 @@ async function confirm() {
   const totalItemsCount = items.value.length;
   const confirmedUpdatesCount = confirmedUpdates.value.length;
 
+  if (hideRest) {
+    const unconfirmedUpdates = Object.values(updates.value).filter(
+      (item) => !item.confirmEdit
+    );
+    for (const { asset } of unconfirmedUpdates) {
+      alreadySeen.value.add(asset.id);
+    }
+  }
+
   clear();
   updates.value = {};
   // Reset back to the first page that would now contain unseen assets.
@@ -161,6 +180,15 @@ async function confirm() {
     // Give some time for the reverse geo-coding to finish
     execute();
   }, 500);
+}
+
+function clearHidden() {
+  const seenItems = allAssets.value.filter(({ asset }) =>
+    alreadySeen.value.has(asset.id)
+  );
+  for (const { asset } of seenItems) {
+    alreadySeen.value.delete(asset.id);
+  }
 }
 </script>
 
@@ -193,9 +221,15 @@ async function confirm() {
         <Message>No images found</Message>
       </article>
     </div>
-    <footer class="flex justify-end gap-3 mt-3">
+    <footer class="flex justify-end items-center gap-3 mt-3">
       <Message v-if="status !== 'success'">
         <p>{{ status }}...</p>
+      </Message>
+      <Message v-if="alreadySeenCount > 0" severity="secondary">
+        <p>{{ alreadySeenCount }} assets hidden</p>
+        <Button @click="clearHidden" :disabled="loading">
+          Show hidden items
+        </Button>
       </Message>
       <Button
         @click="page++"
@@ -205,11 +239,17 @@ async function confirm() {
       </Button>
       <Button
         :disabled="confirmedUpdates.length === 0 || loading"
-        @click="confirm"
+        @click="confirm()"
       >
         Save {{ confirmedUpdates.length }} change{{
           confirmedUpdates.length === 1 ? "" : "s"
         }}
+      </Button>
+      <Button
+        :disabled="confirmedUpdates.length === 0 || loading"
+        @click="confirm({ hideRest: true })"
+      >
+        Save changes and hide the rest
       </Button>
     </footer>
   </section>
