@@ -39,7 +39,6 @@ var {
         // No location
         country: "",
         withExif: true,
-        isVisible: true,
 
         // Search filters
         tagIds,

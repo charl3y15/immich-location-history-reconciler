@@ -8,7 +8,6 @@ export async function* getAllAssets() {
     } = await searchAssets({
       metadataSearchDto: {
         withExif: true,
-        isVisible: true,
         page,
       },
     });
