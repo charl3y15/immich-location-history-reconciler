@@ -31,7 +31,10 @@ let bestLocationMarker: L.Marker | undefined;
 const sourceSegmentsLayer = L.layerGroup();
 
 const provider = new OpenStreetMapProvider();
-const searchControl = GeoSearchControl({ provider: provider, showMarker: false });
+const searchControl = GeoSearchControl({
+  provider: provider,
+  showMarker: false,
+});
 
 onMounted(() => {
   map.value = L.map(mapContainer.value).setView([0, 0], 0);
@@ -85,7 +88,7 @@ watch(
 );
 
 watch(
-  [segments, map],
+  [() => segments, map],
   ([segments, map]) => {
     if (!map) return;
 
