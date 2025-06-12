@@ -202,8 +202,8 @@ const updateAssets = async () => {
         <div class="flex items-center gap-2">
           <Checkbox
             binary
-            indeterminate
-            :model-value="allChecked || (noneChecked && null)"
+            :indeterminate="!allChecked && !noneChecked"
+            :model-value="allChecked"
             @value-change="toggleAll"
           >
             Check all
