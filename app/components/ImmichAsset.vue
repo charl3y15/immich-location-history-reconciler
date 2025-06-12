@@ -7,9 +7,10 @@ import {
 } from "@immich/sdk";
 
 const confirmEdit = defineModel<boolean>("confirmEdit", { default: false });
-const { asset, disableConfirm = false } = defineProps<{
+const { asset, disableConfirm = false, confirmLabel = 'Confirm edit?' } = defineProps<{
   asset: AssetResponseDto;
   disableConfirm?: boolean;
+  confirmLabel?: string;
 }>();
 const timestamp = computed(() => new Date(asset.fileCreatedAt));
 const href = computed(
@@ -55,7 +56,7 @@ const imgUrl = useObjectUrl(data);
     <template #footer>
       <div class="text-end">
         <label>
-          <span class="align-middle mr-1">Confirm edit?</span>
+          <span class="align-middle mr-1">{{ confirmLabel }}</span>
           <Checkbox
             class="align-middle"
             v-model="confirmEdit"

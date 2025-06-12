@@ -134,6 +134,69 @@ const confirmedUpdates = computed(() =>
   Object.values(updates.value).filter((item) => item.confirmEdit)
 );
 
+// Bulk edit mode and selection state
+const bulkEditMode = ref(false);
+const bulkCheckedIds = ref(new Set<string>()); // TODO: Maybe it's better to add another field like "confirmEdit" to Item instead?
+const bulkLocation = ref<LatLng | undefined>(undefined);
+const isBulkDialogOpen = ref(false);
+
+const allCheckedForBulkUpdate = computed(
+  () => Object.keys(updates.value).length === bulkCheckedIds.value.size
+);
+const noneCheckedForBulkUpdate = computed(
+  () => bulkCheckedIds.value.size === 0
+);
+function toggleAllChecked() {
+  if (allCheckedForBulkUpdate.value) {
+    bulkCheckedIds.value.clear();
+  } else {
+    bulkCheckedIds.value = new Set(Object.keys(updates.value));
+  }
+}
+
+function openBulkEditDialog() {
+  isBulkDialogOpen.value = true;
+
+  if (bulkLocation.value == undefined) {
+    const selectedItems = Object.values(updates.value).filter(
+      (item) =>
+        bulkCheckedIds.value.has(item.asset.id) && item.estimatedLocation
+    );
+    const averageLocation = selectedItems.reduce<LatLng>(
+      (acc, item) => {
+        if (item.estimatedLocation) {
+          acc.lat += item.estimatedLocation.lat;
+          acc.lng += item.estimatedLocation.lng;
+        }
+        return acc;
+      },
+      { lat: 0, lng: 0 }
+    );
+    if (averageLocation.lng !== 0 && averageLocation.lat !== 0) {
+      bulkLocation.value = {
+        lat: averageLocation.lat / selectedItems.length,
+        lng: averageLocation.lng / selectedItems.length,
+      };
+    }
+  }
+}
+
+function commitBulkLocationEdits() {
+  if (!bulkLocation.value) return;
+
+  for (const item of Object.values(updates.value)) {
+    if (bulkCheckedIds.value.has(item.asset.id)) {
+      item.estimatedLocation = { ...bulkLocation.value };
+      item.confirmEdit = true;
+    }
+  }
+
+  bulkCheckedIds.value.clear(); // Reset selection for the next bulk edit
+  isBulkDialogOpen.value = false;
+  bulkLocation.value = undefined;
+  bulkEditMode.value = false;
+}
+
 const loading = ref(false);
 async function confirm({ hideRest = false } = {}) {
   loading.value = true;
@@ -174,6 +237,7 @@ async function confirm({ hideRest = false } = {}) {
   // Reset back to the first page that would now contain unseen assets.
   page.value =
     Math.ceil((totalItemsCount - confirmedUpdatesCount) / pageSize) || 1;
+  bulkCheckedIds.value.clear();
 
   alert(
     "Locations saved, but it may take some time for Immich to finish reverse-geocoding. Please reload the page if you see images you already confirmed"
@@ -199,20 +263,64 @@ function clearHidden() {
     {{ error }}
   </Message>
   <section v-else>
+    <div class="mb-2 flex gap-2 items-center">
+      <ToggleButton
+        v-model="bulkEditMode"
+        on-label="Exit bulk edit mode"
+        off-label="Enable bulk edit mode"
+        :class="bulkEditMode ? 'p-button-secondary' : 'p-button-info'"
+        :disabled="loading"
+      />
+      <template v-if="bulkEditMode">
+        <Checkbox
+          binary
+          :disabled="loading"
+          :indeterminate="!allCheckedForBulkUpdate && !noneCheckedForBulkUpdate"
+          :model-value="allCheckedForBulkUpdate"
+          @value-change="toggleAllChecked"
+        />
+        <span>{{ allCheckedForBulkUpdate ? "Uncheck" : "Check" }} all</span>
+        <Button
+          @click="openBulkEditDialog"
+          :disabled="bulkCheckedIds.size === 0 || loading"
+          severity="success"
+        >
+          Update selected assets' locations
+        </Button>
+      </template>
+    </div>
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       <article v-for="{ asset } in updates" :key="asset.id">
         <ImmichAsset
           :asset
           :disable-confirm="
-            updates[asset.id].estimatedLocation == null || loading
+            (!bulkEditMode && updates[asset.id].estimatedLocation == null) ||
+            loading
           "
-          v-model:confirm-edit="updates[asset.id].confirmEdit"
+          :confirm-label="bulkEditMode ? 'Select for edit' : 'Confirm edit'"
+          :confirm-edit="
+            bulkEditMode
+              ? bulkCheckedIds.has(asset.id)
+              : updates[asset.id].confirmEdit
+          "
+          @update:confirm-edit="
+            (val) => {
+              if (bulkEditMode) {
+                if (val) bulkCheckedIds.add(asset.id);
+                else bulkCheckedIds.delete(asset.id);
+              } else {
+                updates[asset.id].confirmEdit = val;
+              }
+            }
+          "
         >
-          <Message v-if="timeline == null" severity="info">
-            Timeline not uploaded.
+          <Message
+            v-if="timeline == null && !updates[asset.id].estimatedLocation"
+            severity="info"
+          >
+            Timeline not uploaded. Cannot estimate location.
           </Message>
           <LeafletMap
-            v-else
             v-model="updates[asset.id].estimatedLocation"
             @update:model-value="updates[asset.id].confirmEdit = true"
             :segments="updates[asset.id].geometry"
@@ -223,6 +331,31 @@ function clearHidden() {
         <Message>No images found</Message>
       </article>
     </div>
+    <!-- Bulk location update dialog -->
+    <Dialog
+      v-model:visible="isBulkDialogOpen"
+      header="Update location for selected images"
+      modal
+    >
+      <div class="mb-2">
+        <p>
+          Pick a new location to apply to
+          <b>{{ bulkCheckedIds.size }}</b> images:
+        </p>
+        <!-- TODO: pass segments of all selected images? -->
+        <LeafletMap v-model="bulkLocation" style="height: 300px" />
+      </div>
+      <template #footer>
+        <Button @click="isBulkDialogOpen = false">Cancel</Button>
+        <Button
+          @click="commitBulkLocationEdits"
+          :disabled="bulkLocation == undefined"
+          severity="success"
+        >
+          Update
+        </Button>
+      </template>
+    </Dialog>
     <footer class="flex justify-end items-center gap-3 mt-3">
       <Message v-if="status !== 'success'">
         <p>{{ status }}...</p>
@@ -240,7 +373,7 @@ function clearHidden() {
         Load more items
       </Button>
       <Button
-        :disabled="confirmedUpdates.length === 0 || loading"
+        :disabled="confirmedUpdates.length === 0 || loading || bulkEditMode"
         @click="confirm()"
       >
         Save {{ confirmedUpdates.length }} change{{
@@ -248,7 +381,7 @@ function clearHidden() {
         }}
       </Button>
       <Button
-        :disabled="confirmedUpdates.length === 0 || loading"
+        :disabled="confirmedUpdates.length === 0 || loading || bulkEditMode"
         @click="confirm({ hideRest: true })"
       >
         Save changes and hide the rest

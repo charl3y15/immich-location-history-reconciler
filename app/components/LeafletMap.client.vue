@@ -20,8 +20,8 @@ if (!import.meta.dev) {
 
 const bestLocation = defineModel<LatLng>();
 
-const { segments } = defineProps<{
-  segments: Geometry[];
+const { segments = [] } = defineProps<{
+  segments?: Geometry[];
 }>();
 
 const mapContainer = templateRef("leafletMap");
