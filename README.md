@@ -10,7 +10,9 @@ All data is processed locally in your browser, and no data is sent to any server
 Start by [generating an API key](https://immich.app/docs/features/command-line-interface/#obtain-the-api-key) for your Immich instance, then go to <https://aabounegm.github.io/immich-location-history-reconciler> and input the server details there.
 
 > [!IMPORTANT]
-> Your Immich server needs to be behind a reverse proxy that allows Cross-Origin Resource Sharing since this tool is hosted on a separate domain
+> Your Immich server needs to be behind a reverse proxy that allows Cross-Origin Resource Sharing since this tool is hosted on a separate domain.
+>
+> The API key should have at least the following permissions (starting with Immich v1.135.0): `asset.update`, `asset.view`, and `tag.read`.
 
 ### Location fixer
 
