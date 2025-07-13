@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { searchAssets, updateAsset, type AssetResponseDto } from "@immich/sdk";
+import {
+  searchAssets,
+  updateAsset,
+  searchAssetStatistics,
+  type AssetResponseDto,
+  type StatisticsSearchDto,
+  type MetadataSearchDto,
+} from "@immich/sdk";
 import { segmentToGeometry, type Geometry } from "~/lib/geometry";
 import { useTimeline, type LatLng } from "~/lib/timeline";
 
@@ -20,6 +27,7 @@ const { estimateLocationAtTime, timeline } = useTimeline();
 type TransformedSearchResponse = {
   assets: AssetResponseDto[];
   hasNextPage: boolean;
+  total: number;
 };
 
 const page = ref(1); // Note: cannot decrease page without clearing results first. Only increment.
@@ -34,26 +42,29 @@ var {
   (async () => {
     const previousAssets = result?.value?.assets ?? [];
 
-    const { assets } = await searchAssets({
-      metadataSearchDto: {
-        // No location
-        country: "",
-        withExif: true,
+    const searchFilters = {
+      country: "",
+      tagIds,
+      isNotInAlbum,
+      model: cameraModel,
+    } satisfies StatisticsSearchDto & MetadataSearchDto;
 
-        // Search filters
-        tagIds,
-        isNotInAlbum,
-        model: cameraModel,
-
-        // Pagination
-        size: pageSize,
-        page: page.value,
-      },
-    });
+    const [{ total }, { assets }] = await Promise.all([
+      searchAssetStatistics({ statisticsSearchDto: searchFilters }),
+      searchAssets({
+        metadataSearchDto: {
+          withExif: true,
+          size: pageSize,
+          page: page.value,
+          ...searchFilters,
+        },
+      }),
+    ]);
 
     return {
       assets: [...previousAssets, ...assets.items],
       hasNextPage: assets.nextPage != null,
+      total,
     };
   }) as () => Promise<TransformedSearchResponse>,
   {
@@ -370,7 +381,7 @@ function clearHidden() {
         @click="page++"
         :disabled="!result?.hasNextPage || status === 'pending' || loading"
       >
-        Load more items
+        Load more items ({{ items.length }} / {{ result?.total }})
       </Button>
       <Button
         :disabled="confirmedUpdates.length === 0 || loading || bulkEditMode"
