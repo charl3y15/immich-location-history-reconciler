@@ -13,6 +13,8 @@ Start by [generating an API key](https://immich.app/docs/features/command-line-i
 > Your Immich server needs to be behind a reverse proxy that allows Cross-Origin Resource Sharing since this tool is hosted on a separate domain.
 >
 > The API key should have at least the following permissions (starting with Immich v1.135.0): `asset.update`, `asset.view`, and `tag.read`.
+>
+> **Update**: Starting with v1.137.0, the following additional permissions are also required: `asset.read`, `asset.statistics`
 
 ### Location fixer
 
