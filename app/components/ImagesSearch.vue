@@ -381,7 +381,7 @@ function clearHidden() {
         @click="page++"
         :disabled="!result?.hasNextPage || status === 'pending' || loading"
       >
-        Load more items ({{ items.length }} / {{ result?.total }})
+        Load more items (showing {{ items.length }} / {{ (result?.total ?? 0) - alreadySeenCount }})
       </Button>
       <Button
         :disabled="confirmedUpdates.length === 0 || loading || bulkEditMode"
