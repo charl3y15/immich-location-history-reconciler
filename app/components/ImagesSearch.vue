@@ -274,7 +274,7 @@ function clearHidden() {
     {{ error }}
   </Message>
   <section v-else>
-    <div class="mb-2 flex gap-2 items-center">
+    <div class="mb-2 flex gap-2 items-center sticky top-0 z-[10000] p-2 bg-primary-contrast">
       <ToggleButton
         v-model="bulkEditMode"
         on-label="Exit bulk edit mode"
