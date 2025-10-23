@@ -8,13 +8,25 @@ const emit = defineEmits<{
 const baseUrl = useLocalStorage("base-url", "");
 const apiKey = useLocalStorage("api-key", "");
 
+// In development, use the proxy URL to avoid CORS issues
+const isDev = process.dev;
+const effectiveBaseUrl = computed(() => {
+  if (isDev && baseUrl.value) {
+    // Use the proxy for API calls in development
+    return "/api";
+  }
+  return baseUrl.value;
+});
+
 watch(
   [baseUrl, apiKey],
   ([baseUrl, apiKey]) => {
     if (baseUrl && apiKey) {
-      init({ baseUrl, apiKey });
+      // Use the proxy URL in development, original URL in production
+      const urlToUse = isDev ? "/api" : baseUrl;
+      init({ baseUrl: urlToUse, apiKey });
     }
-    emit("init", { apiKey, baseUrl });
+    emit("init", { apiKey, baseUrl: effectiveBaseUrl.value });
   },
   { immediate: true }
 );
@@ -31,6 +43,9 @@ watch(
           placeholder="https://immich.example.com/api"
         />
         <label for="base-url">Immich API base URL</label>
+        <small v-if="isDev && baseUrl" class="text-green-600">
+          Development mode: Using proxy at /api (targeting {{ baseUrl }})
+        </small>
       </IftaLabel>
       <IftaLabel>
         <InputText id="api-key" v-model="apiKey" />

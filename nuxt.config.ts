@@ -24,4 +24,13 @@ export default defineNuxtConfig({
       },
     },
   },
+  nitro: {
+    devProxy: {
+      '/api': {
+        target: process.env.IMMICH_API_URL || 'http://localhost:2283/api',
+        changeOrigin: true,
+        prependPath: true,
+      }
+    }
+  },
 });
